@@ -1,0 +1,177 @@
+// ============================================================================
+// GEMINIA COLOR SCHEME - Pantone Based
+// ============================================================================
+// This file defines the official color palette for the entire application
+// All blue colors have been replaced with Pantone 328U and 366C
+// ============================================================================
+
+// --- PRIMARY COLORS (Pantone Based) ---
+$primary-teal: #00787C;        // Pantone 328U - Main brand color (replaces light blue)
+$primary-lime: #B8D432;        // Pantone 366C - Accent color (replaces some blues)
+$primary-dark: #005A5D;        // Darker teal for hover states
+$primary-light: #00A3A8;       // Lighter teal for backgrounds
+
+// --- SECONDARY COLORS ---
+$secondary-dark: #21275c;      // Keep for specific elements (not primary)
+$secondary-gray: #6B7280;      // Neutral gray
+$secondary-green: #10B981;     // Success states
+$secondary-red: #EF4444;       // Error states
+$secondary-amber: #F59E0B;     // Warning states
+
+// --- NEUTRAL COLORS ---
+$white: #FFFFFF;
+$gray-50: #F9FAFB;
+$gray-100: #F3F4F6;
+$gray-200: #E5E7EB;
+$gray-300: #D1D5DB;
+$gray-400: #9CA3AF;
+$gray-500: #6B7280;
+$gray-600: #4B5563;
+$gray-700: #374151;
+$gray-800: #1F2937;
+$gray-900: #111827;
+$black: #000000;
+
+// --- SEMANTIC COLORS ---
+$success: #10B981;
+$error: #EF4444;
+$warning: #F59E0B;
+$info: $primary-teal;
+
+// --- OLD COLORS (DEPRECATED - DO NOT USE) ---
+// These are kept for reference only
+// $pantone-light-blue: #00787C;  // REPLACED by $primary-teal
+// $pantone-dark-blue: #21275c;   // REPLACED by $secondary-dark (limited use)
+
+// ============================================================================
+// COLOR USAGE GUIDE
+// ============================================================================
+
+// PRIMARY TEAL (#00787C) - Use for:
+// - Sidebar backgrounds
+// - Primary buttons
+// - Active states
+// - Links
+// - Icons (primary)
+// - Focus states
+// - Borders (primary)
+
+// PRIMARY LIME (#B8D432) - Use for:
+// - Section headers
+// - Accent elements
+// - Highlights
+// - Call-to-action secondary
+// - Progress indicators
+
+// SECONDARY DARK (#21275c) - Use for:
+// - Text (headings)
+// - Specific branded elements
+// - Limited use only
+
+// ============================================================================
+// UTILITY CLASSES
+// ============================================================================
+
+// Background Colors
+.bg-primary-teal { background-color: $primary-teal !important; }
+.bg-primary-lime { background-color: $primary-lime !important; }
+.bg-primary-dark { background-color: $primary-dark !important; }
+.bg-primary-light { background-color: $primary-light !important; }
+.bg-secondary-dark { background-color: $secondary-dark !important; }
+.bg-white { background-color: $white !important; }
+.bg-gray-50 { background-color: $gray-50 !important; }
+.bg-gray-100 { background-color: $gray-100 !important; }
+
+// Text Colors
+.text-primary-teal { color: $primary-teal !important; }
+.text-primary-lime { color: $primary-lime !important; }
+.text-primary-dark { color: $primary-dark !important; }
+.text-secondary-dark { color: $secondary-dark !important; }
+.text-gray-600 { color: $gray-600 !important; }
+.text-gray-700 { color: $gray-700 !important; }
+.text-gray-900 { color: $gray-900 !important; }
+.text-white { color: $white !important; }
+
+// Border Colors
+.border-primary-teal { border-color: $primary-teal !important; }
+.border-primary-lime { border-color: $primary-lime !important; }
+.border-gray-200 { border-color: $gray-200 !important; }
+.border-gray-300 { border-color: $gray-300 !important; }
+
+// Hover States
+.hover-primary-teal:hover { background-color: $primary-teal !important; }
+.hover-primary-dark:hover { background-color: $primary-dark !important; }
+.hover-text-teal:hover { color: $primary-teal !important; }
+
+// Focus States
+.focus-teal:focus {
+    border-color: $primary-teal !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(0, 120, 124, 0.1) !important;
+}
+
+// ============================================================================
+// COMPONENT-SPECIFIC COLORS
+// ============================================================================
+
+// Buttons
+$button-primary-bg: $primary-teal;
+$button-primary-hover: $primary-dark;
+$button-primary-text: $white;
+
+$button-secondary-bg: $primary-lime;
+$button-secondary-hover: darken($primary-lime, 10%);
+$button-secondary-text: $white;
+
+$button-outline-border: $primary-teal;
+$button-outline-text: $primary-teal;
+$button-outline-hover-bg: rgba($primary-teal, 0.1);
+
+// Forms
+$input-border: $gray-300;
+$input-border-focus: $primary-teal;
+$input-bg: $white;
+$input-text: $gray-900;
+$input-placeholder: $gray-400;
+
+// Links
+$link-color: $primary-teal;
+$link-hover: $primary-dark;
+
+// Sidebar
+$sidebar-bg: $primary-teal;
+$sidebar-text: $white;
+$sidebar-active-bg: rgba($white, 0.2);
+$sidebar-hover-bg: rgba($white, 0.1);
+
+// Headers
+$header-bg: $primary-lime;
+$header-text: $white;
+
+// Cards
+$card-bg: $white;
+$card-border: $gray-200;
+$card-shadow: rgba(0, 0, 0, 0.05);
+
+// ============================================================================
+// EXPORT FOR TAILWIND (if needed)
+// ============================================================================
+
+:export {
+    primaryTeal: $primary-teal;
+    primaryLime: $primary-lime;
+    primaryDark: $primary-dark;
+    primaryLight: $primary-light;
+    secondaryDark: $secondary-dark;
+    white: $white;
+    gray50: $gray-50;
+    gray100: $gray-100;
+    gray200: $gray-200;
+    gray300: $gray-300;
+    gray400: $gray-400;
+    gray500: $gray-500;
+    gray600: $gray-600;
+    gray700: $gray-700;
+    gray800: $gray-800;
+    gray900: $gray-900;
+}

@@ -1,0 +1,51 @@
+========================================
+SAVE THE FIDELITY LOGO - STEP BY STEP
+========================================
+
+STEP 1: Save the Logo Image
+----------------------------
+1. Look at the Fidelity logo image in this chat (the one you just uploaded)
+2. RIGHT-CLICK on the image
+3. Select "Save image as..." or "Save picture as..."
+
+STEP 2: Choose Location
+------------------------
+Navigate to this EXACT folder:
+c:\Users\Wilsonkamau\Desktop\geminia-final-wilson-code\geminia-final\public\images\logo\
+
+STEP 3: Name the File
+---------------------
+File name: logo.png
+(exactly this, lowercase, no spaces)
+
+STEP 4: Save
+------------
+Click "Save"
+
+STEP 5: Verify
+--------------
+Open PowerShell and run:
+cd c:\Users\Wilsonkamau\Desktop\geminia-final-wilson-code\geminia-final
+dir public\images\logo\logo.png
+
+You should see the file listed.
+
+STEP 6: Restart Server
+----------------------
+In your terminal where ng serve is running:
+- Press Ctrl+C to stop
+- Run: ng serve
+
+STEP 7: Clear Browser Cache
+----------------------------
+Press: Ctrl + Shift + Delete
+OR
+Press: Ctrl + F5 (hard refresh)
+
+STEP 8: Refresh Browser
+------------------------
+Press F5
+
+========================================
+DONE! Logo should now appear everywhere!
+========================================

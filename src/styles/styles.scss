@@ -1,0 +1,241 @@
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ Import/write your custom styles here.
+/*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
+/* ----------------------------------------------------------------------------------------------------- */
+
+@use 'color-scheme' as colors;
+@use 'components/login-toast';
+// src/styles.scss
+
+// ... other global styles ...
+
+/* Ensure all screens have proper min-height for responsive design */
+html, body {
+  min-height: 100vh;
+  min-width: 320px; /* Minimum width for mobile devices */
+}
+
+/* Ensure app root takes full height */
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Ensure router-outlet content takes full height */
+router-outlet ~ * {
+  min-height: 100%;
+}
+
+// Custom panel class for Geminia snackbar/toast notifications
+.geminia-toast-panel {
+  background-color: #21275c; // Pantone 2758C
+  color: white; // Ensure text is readable
+}
+
+/* Global bold text styling for all form inputs and textboxes */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="password"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"],
+input[type="url"],
+input[type="search"],
+select,
+textarea,
+.mat-mdc-input-element,
+.mat-mdc-select-value,
+.mat-mdc-form-field input,
+.mat-input-element,
+.mat-select-value-text {
+  font-weight: bold !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+/* Ensure Material Design components have bold text */
+.mat-mdc-select-value-text,
+.mat-mdc-form-field .mat-mdc-input-element,
+.mat-mdc-form-field .mat-mdc-select-value,
+.mat-form-field-infix input,
+.mat-form-field-infix textarea,
+.mat-form-field-infix select {
+  font-weight: bold !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+/* Bold text for readonly and disabled inputs */
+input[readonly],
+input[disabled],
+textarea[readonly],
+textarea[disabled] {
+  font-weight: bold !important;
+}
+
+/* Bold text for file inputs */
+input[type="file"] {
+  font-weight: bold !important;
+}
+
+/* Ensure placeholder text is also bold */
+input::placeholder,
+textarea::placeholder,
+.mat-mdc-input-element::placeholder {
+  font-weight: bold !important;
+  opacity: 0.7;
+}
+
+/* Fix for text field sizing in production/nginx deployment */
+.mat-mdc-form-field {
+  font-size: 0.875rem !important; // Match Tailwind base size
+}
+
+.mat-mdc-text-field-wrapper {
+  font-size: inherit !important;
+}
+
+.mat-mdc-form-field-infix {
+  min-height: auto !important;
+  font-size: inherit !important;
+}
+
+/* Ensure consistent input sizing across all environments */
+input.mat-mdc-input-element,
+textarea.mat-mdc-input-element {
+  font-size: 0.875rem !important; // 14px - Tailwind base
+  line-height: 1.5 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Fix for Material select fields */
+.mat-mdc-select {
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+}
+
+.mat-mdc-select-value {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+/* Sidebar Navigation Icons - Lime Green */
+fuse-vertical-navigation .fuse-vertical-navigation-item-wrapper .fuse-vertical-navigation-item .fuse-vertical-navigation-item-icon {
+  color: #B8D432 !important;
+}
+
+fuse-vertical-navigation .fuse-vertical-navigation-item-wrapper .fuse-vertical-navigation-item mat-icon {
+  color: #B8D432 !important;
+}
+
+/* Active navigation item */
+fuse-vertical-navigation .fuse-vertical-navigation-item-wrapper .fuse-vertical-navigation-item.fuse-vertical-navigation-item-active mat-icon {
+  color: #B8D432 !important;
+}
+
+/* Hover state */
+fuse-vertical-navigation .fuse-vertical-navigation-item-wrapper .fuse-vertical-navigation-item:hover mat-icon {
+  color: #B8D432 !important;
+}
+
+/* Global Focus Colors - Lime Green for All Inputs and Selects */
+input:focus,
+select:focus,
+textarea:focus,
+.mat-mdc-input-element:focus,
+.mat-mdc-select:focus {
+  outline: none !important;
+  border-color: #B8D432 !important;
+  box-shadow: 0 0 0 3px rgba(184, 212, 50, 0.2) !important;
+}
+
+/* Material Form Field Focus */
+.mat-mdc-form-field.mat-focused .mat-mdc-form-field-focus-overlay {
+  opacity: 0 !important;
+}
+
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: #B8D432 !important;
+}
+
+/* Radio Button Focus - Lime Green */
+input[type="radio"]:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(184, 212, 50, 0.2) !important;
+}
+
+input[type="radio"]:checked {
+  accent-color: #B8D432 !important;
+}
+
+/* Material Radio Button */
+.mat-mdc-radio-button.mat-accent {
+  --mdc-radio-selected-icon-color: #B8D432 !important;
+  --mdc-radio-selected-hover-icon-color: #B8D432 !important;
+  --mdc-radio-selected-pressed-icon-color: #B8D432 !important;
+  --mdc-radio-selected-focus-icon-color: #B8D432 !important;
+}
+
+.mat-mdc-radio-button.mat-primary {
+  --mdc-radio-selected-icon-color: #B8D432 !important;
+  --mdc-radio-selected-hover-icon-color: #B8D432 !important;
+  --mdc-radio-selected-pressed-icon-color: #B8D432 !important;
+  --mdc-radio-selected-focus-icon-color: #B8D432 !important;
+}
+
+/* Dropdown/Select Options - Remove Blue/Teal Colors */
+select option:checked,
+select option:hover {
+  background-color: #B8D432 !important;
+  color: white !important;
+}
+
+/* Material Select Panel */
+.mat-mdc-select-panel .mat-mdc-option.mat-mdc-option-active,
+.mat-mdc-select-panel .mat-mdc-option:hover {
+  background-color: rgba(184, 212, 50, 0.1) !important;
+}
+
+.mat-mdc-select-panel .mat-mdc-option.mdc-list-item--selected {
+  background-color: rgba(184, 212, 50, 0.2) !important;
+}
+
+/* Material Autocomplete Panel */
+.mat-mdc-autocomplete-panel .mat-mdc-option.mat-mdc-option-active,
+.mat-mdc-autocomplete-panel .mat-mdc-option:hover {
+  background-color: rgba(184, 212, 50, 0.1) !important;
+}
+
+.mat-mdc-autocomplete-panel .mat-mdc-option.mdc-list-item--selected {
+  background-color: rgba(184, 212, 50, 0.2) !important;
+}
+
+/* Native Select Dropdown */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+select option {
+  background-color: white !important;
+  color: #333 !important;
+}
+
+select option:checked {
+  background-color: #B8D432 !important;
+  color: white !important;
+}
+
+/* Remove blue highlight from select options */
+select:focus option:checked {
+  background: linear-gradient(#B8D432, #B8D432) !important;
+  background-color: #B8D432 !important;
+}
