@@ -542,7 +542,7 @@ export class TermsPrivacyModalComponent {
                                     </p>
                                 </div>
                             </div>
-                            <div *ngIf="mpesaSubMethod === 'paybill'" class="option-view animate-fade-in">
+                                <div *ngIf="mpesaSubMethod === 'paybill'" class="option-view animate-fade-in">
                                 <div class="paybill-details">
                                     <div class="detail-item"><span class="label">Paybill Number:</span><span
                                         class="value">853338</span></div>
@@ -551,9 +551,8 @@ export class TermsPrivacyModalComponent {
                                 </div>
                                 <form [formGroup]="paybillForm" (keydown.enter)="verifyPaybillPayment()">
                                     <div class="phone-input-wrapper">
-                                        <input type="tel" formControlName="mpesaCode" placeholder="TAA1234T4"
+                                        <input type="text" formControlName="mpesaCode" placeholder="TAA1234T4"
                                                class="phone-input" [disabled]="isVerifyingPaybill" (keydown.enter)="verifyPaybillPayment()" />
-                                        <mat-icon class="phone-icon">phone_iphone</mat-icon>
                                     </div>
                                 </form>
                                 <button class="btn-primary w-full" (click)="verifyPaybillPayment()"

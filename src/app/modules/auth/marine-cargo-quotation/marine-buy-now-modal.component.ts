@@ -10,7 +10,16 @@ import {
     NgZone,
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { FormBuilder, FormGroup, FormControl, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
+import {
+    FormBuilder,
+    FormGroup,
+    FormControl,
+    Validators,
+    AbstractControl,
+    ValidationErrors,
+    ReactiveFormsModule,
+    FormsModule,
+} from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -174,6 +183,7 @@ export interface MarineBuyNowData {
         MatTooltipModule,
         NgxMatSelectSearchModule,
         ThousandsSeparatorValueAccessor,
+        FormsModule,
     ],
     providers: [DatePipe],
     templateUrl: './marine-buy-now-modal.component.html',
@@ -1570,6 +1580,66 @@ export interface MarineBuyNowData {
                 }
             }
         }
+        .sub-option-label {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: 0.2s;
+        }
+
+        .sub-option-label input[type="radio"] {
+            margin-right: 8px;
+            accent-color: #009688; /* teal */
+        }
+
+        .sub-option-label.active,
+        .sub-option-label:hover {
+            border-color: #009688;
+            background-color: #e0f2f1;
+        }
+
+        .phone-input-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .phone-input {
+            width: 100%;
+            padding: 14px 50px 14px 16px;
+            font-size: 16px;
+            font-weight: 500;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            background-color: white;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .phone-input:focus {
+            outline: none;
+            border-color: #B8D432;
+            box-shadow: 0 0 0 3px rgba(184, 212, 50, 0.1);
+        }
+
+        .phone-input:disabled {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+        }
+
+        .phone-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            pointer-events: none;
+        }
 
     `]
 
@@ -1587,11 +1657,17 @@ export class MarineBuyNowModalComponent implements OnInit, AfterViewInit {
     tax = 0;
     total = 0;
     isMakePaymentNow = false;
+    isVerifyingPaybill = false;
+    toastMessage: string = '';
     paymentRefNo: string ='';
+    shippingId: number = 0;
+    paybillForm!: FormGroup;
+    paymentForm!: FormGroup;
+    mpesaSubMethod: 'stk' | 'paybill' = 'stk';
 
     // Track duplicate file errors
     duplicateFileErrors: { [key: string]: string } = {};
-    
+
     // Today's date for min date validation
     today = new Date();
 
@@ -1686,7 +1762,10 @@ export class MarineBuyNowModalComponent implements OnInit, AfterViewInit {
         private dialog: MatDialog,
         private router: Router,
         private ngZone: NgZone
-    ) {}
+    ) {
+        this.paybillForm = this.fb.group({ mpesaCode: ['', [Validators.required]] });
+        this.paymentForm = this.fb.group({ mpesaSubMethod: ['stk'], });
+    }
 
     ngOnInit(): void {
         // Initialize loading state
@@ -1773,6 +1852,22 @@ export class MarineBuyNowModalComponent implements OnInit, AfterViewInit {
             next: (res) => {
                 console.log(res);
                 this.quoteData = res;
+                if(res.idDocumentExists){
+                    this.shipmentForm.get('nationalId')?.clearValidators();
+                    this.shipmentForm.get('nationalId')?.updateValueAndValidity();
+                }
+                else{
+                    this.shipmentForm.get('nationalId')?.setValidators(Validators.required);
+                    this.shipmentForm.get('nationalId')?.updateValueAndValidity();
+                }
+                if(res.kraDocumentExists){
+                    this.shipmentForm.get('kraPinCertificate')?.clearValidators();
+                    this.shipmentForm.get('kraPinCertificate')?.updateValueAndValidity();
+                }
+                else{
+                    this.shipmentForm.get('kraPinCertificate')?.setValidators(Validators.required);
+                    this.shipmentForm.get('kraPinCertificate')?.updateValueAndValidity();
+                }
                 this.shipmentForm.get('idNumber')?.setValue(res.idNumber);
                 this.shipmentForm.get('streetAddress')?.setValue(res.postalAddress);
                 this.shipmentForm.get('postalCode')?.setValue(res.postalCode);
@@ -2004,27 +2099,108 @@ export class MarineBuyNowModalComponent implements OnInit, AfterViewInit {
         }
     }
 
+    verifyPaybillPayment(): void {
+        if (this.paybillForm.invalid) {
+            this.showToast('Please enter mpesa code to continue....');
+            return;
+        }
+        this.isVerifyingPaybill = true;
+        const mpesaCode = this.paybillForm.get('mpesaCode')?.value;
+        console.log('mpesa code ..',mpesaCode);
+
+        this.quoteService.validatePaybillTransaction(mpesaCode)
+            .subscribe({
+                next: (res) => {
+                    console.log(res);
+
+                    if (!res) {
+                        this.showToast('No response from server.');
+                        this.isVerifyingPaybill = false;
+                        return;
+                    }
+
+                    if(res.debitnoteno){
+                        if(res.debitnoteno.toUpperCase()!==this.paymentRefNo.toUpperCase()){
+                            this.showToast(
+                                `Payment reference ${res.debitnoteno} entered on Mpesa does not match expected reference: ${this.paymentRefNo}`
+                            );
+                            this.isVerifyingPaybill = false;
+                            return;
+                        }
+                    }
+
+                    const paymentData = {
+                        "proposalId":this.shippingId,
+                        "paymentRefNo":res.pymentmemo,
+                        "amount":res.amount,
+                        "locale":"en_US",
+                        "paymentMode":'Mpesa',
+                    };
+
+                    const amount = res.amount;
+
+                    this.quoteService.savePaybillPayment(paymentData).subscribe({
+                        next: () => {
+                            this.showToast(
+                                `Dear customer, your payment of Ksh ${amount} for Marine Transaction reference ${this.paymentRefNo} has been successfully received.`
+                            );
+                            this.isVerifyingPaybill = false;
+                            setTimeout(() => {
+                                this.dialogRef.close({
+                                    success: true,
+                                    method: 'paybill',
+                                    reference: this.paymentRefNo,
+                                    mpesaReceipt: mpesaCode
+                                });
+                                this.router.navigate(['/dashboard']);
+                            }, 1000)
+
+                        },
+                        error: (err) => {
+                            console.error('Error saving payment:', err);
+                            this.showToast('Error saving payment. Please try again.');
+                            this.isVerifyingPaybill = false;
+                        },
+                    });
+
+                },
+                error: (err) => {
+                    if (err.name === 'TimeoutError') {
+                        this.showToast('Paybill Validation Request Timeout.');
+                    } else {
+                        this.showToast('Unknown error occured  '+err.message || err);
+                    }
+                    this.isVerifyingPaybill = false;
+                }
+            });
+    }
+
+    private showToast(message: string): void {
+        this.toastMessage = message;
+        setTimeout(() => (this.toastMessage = ''), 5000);
+    }
+
     onSubmit(): void {
-        // if (this.shipmentForm.invalid) {
-        //     // Mark all fields as touched to show validation errors
-        //     this.shipmentForm.markAllAsTouched();
-        //
-        //     const invalidFields = Object.keys(this.shipmentForm.controls)
-        //         .filter(key => this.shipmentForm.get(key)?.invalid)
-        //         .map(key => ({
-        //             field: key,
-        //             errors: this.shipmentForm.get(key)?.errors
-        //         }));
-        //
-        //     console.warn('❌ Invalid form fields:', invalidFields);
-        //
-        //
-        //     this.snackBar.open('Please fill in all required fields correctly', 'Close', {
-        //         duration: 5000,
-        //         panelClass: ['error-snackbar']
-        //     });
-        //     return;
-        // }
+        if (this.shipmentForm.invalid) {
+            // Mark all fields as touched to show validation errors
+            this.shipmentForm.markAllAsTouched();
+
+            const invalidFields = Object.keys(this.shipmentForm.controls)
+                .filter(key => this.shipmentForm.get(key)?.invalid)
+                .map(key => ({
+                    field: key,
+                    errors: this.shipmentForm.get(key)?.errors
+                }));
+
+            console.warn('❌ Invalid form fields:', invalidFields);
+
+
+            this.snackBar.open('Please fill in all required fields correctly', 'Close', {
+                duration: 5000,
+                panelClass: ['error-snackbar']
+            });
+            return;
+        }
 
         this.isSubmitting = true;
         const kycFormValue = this.shipmentForm.getRawValue(); // Use getRawValue to include disabled fields
@@ -2080,6 +2256,7 @@ export class MarineBuyNowModalComponent implements OnInit, AfterViewInit {
                 const refNo = applicationResponse?.transactionId;
                 this.isMakePaymentNow = true;
                 this.paymentRefNo = refNo;
+                this.shippingId = applicationResponse?.shippingId;
                // this.router.navigate(['/dashboard']);
 
                 // Now initiate M-Pesa payment
@@ -2963,7 +3140,7 @@ export class MarineBuyNowModalComponent implements OnInit, AfterViewInit {
             if (dispatchDate) {
                 const arrivalControl = this.shipmentForm.get('estimatedArrival');
                 const arrivalDate = arrivalControl?.value;
-                
+
                 // If arrival date exists and is before dispatch date, clear it
                 if (arrivalDate && new Date(arrivalDate) < new Date(dispatchDate)) {
                     arrivalControl?.setValue('');
@@ -2976,7 +3153,7 @@ export class MarineBuyNowModalComponent implements OnInit, AfterViewInit {
         this.shipmentForm.get('estimatedArrival')?.valueChanges.subscribe(arrivalDate => {
             if (arrivalDate) {
                 const dispatchDate = this.shipmentForm.get('dateOfDispatch')?.value;
-                
+
                 // Validate that arrival date is not before dispatch date
                 if (dispatchDate && new Date(arrivalDate) < new Date(dispatchDate)) {
                     this.shipmentForm.get('estimatedArrival')?.setErrors({ beforeDispatch: true });
@@ -3196,7 +3373,7 @@ export class MarineBuyNowModalComponent implements OnInit, AfterViewInit {
     // Format amount to hide .00 decimals for whole numbers
     formatAmount(value: number): string {
         if (!value && value !== 0) return '0';
-        
+
         // Check if the number is a whole number
         if (value % 1 === 0) {
             // Return without decimals, with thousand separators

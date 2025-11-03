@@ -522,6 +522,18 @@
             <span>Total Amount</span>
             <span class="text-pantone-teal-dark">KES {{ quoteData.netprem | number:'1.2-2' }}</span>
           </div>
+            <div class="mb-4 mt-2" *ngIf="!isMakePaymentNow">
+                <button
+                    mat-raised-button
+                    color="primary"
+                    class="w-full mt-2 mb-2 pay-now-button"
+                    (click)="onSubmit()"
+                    [disabled]="isSubmitting"
+                >
+                    <mat-spinner *ngIf="isSubmitting" diameter="24" class="mr-2"></mat-spinner>
+                    {{ isSubmitting ? 'Processing...' : 'Submit Application' }}
+                </button>
+            </div>
 
           <!-- M-Pesa Number Field -->
           <div class="mb-4 mt-2" *ngIf="isMakePaymentNow">
@@ -533,29 +545,91 @@
                   <span>Account Number:</span>
                   <span class="text-pantone-teal-dark">{{ paymentRefNo}}</span>
               </div>
-            <label class="block text-base font-medium text-gray-700 mb-2">M-Pesa Number *</label>
-            <input [class]="'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ' +
-                   ((shipmentForm.get('mpesaNumber')?.invalid && shipmentForm.get('mpesaNumber')?.touched) || !shipmentForm.get('mpesaNumber')?.value ?
-                   'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-pantone-teal') +
-                   (shipmentForm.get('mpesaNumber')?.value ? ' font-bold' : '')"
-                   formControlName="mpesaNumber"
-                   placeholder="Enter M-Pesa number"
-                   maxlength="10"
-                   (input)="onMpesaNumberInput($event)">
-          </div>
-            <div class="mb-4 mt-2" *ngIf="!isMakePaymentNow">
-              <button mat-raised-button color="primary" class="w-full mt-2 mb-2 pay-now-button" (click)="onSubmit()" [disabled]="isSubmitting || !isFormValid">
-                <mat-spinner *ngIf="isSubmitting" diameter="24" class="mr-2"></mat-spinner>
-                {{ isSubmitting ? 'Processing...' : (!isFormValid ? 'Complete All Fields' : 'Submit Application') }}
-              </button>
-            </div>
-            <div class="mb-4 mt-2" *ngIf="isMakePaymentNow">
-                <button mat-raised-button color="primary" class="w-full mt-2 mb-2 pay-now-button payment-button-with-icon" [disabled]="isProcessPayment" (click)="initiatePayment()">
-                    <mat-icon *ngIf="!isProcessPayment" class="payment-icon">account_balance_wallet</mat-icon>
-                    <mat-spinner *ngIf="isProcessPayment" diameter="24" class="mr-2"></mat-spinner>
-                    <span class="payment-text">{{ isProcessPayment ? 'Processing...' : 'Pay KES ' + formatAmount(calculateTotalAmount()) + ' for Marine Cargo Insurance for Quote ' + quoteData.quoteNumber }}</span>
-                </button>
-            </div>
+              <div class="sub-options" *ngIf="isMakePaymentNow" [formGroup]="paymentForm">
+                  <label class="sub-option-label">
+                      <input
+                          type="radio"
+                          formControlName="mpesaSubMethod"
+                          value="stk"
+                      />
+                      <mat-icon>tap_and_play</mat-icon>
+                      <span>STK Push</span>
+                  </label>
+
+                  <label class="sub-option-label">
+                      <input
+                          type="radio"
+                          formControlName="mpesaSubMethod"
+                          value="paybill"
+                      />
+                      <mat-icon>article</mat-icon>
+                      <span>Use Paybill</span>
+                  </label>
+              </div>
+
+
+              <!-- Paybill option -->
+             <div *ngIf="isMakePaymentNow">
+              <form
+                  [formGroup]="paybillForm"
+                  (keydown.enter)="verifyPaybillPayment()"
+                  *ngIf="paymentForm.get('mpesaSubMethod')?.value === 'paybill'"
+              >
+                  <label class="block text-base font-medium text-gray-700 mb-2">M-Pesa Code *</label>
+
+                      <input type="text"
+                          formControlName="mpesaCode"
+                          placeholder="TAA1234T4"
+                          class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
+                          [disabled]="isVerifyingPaybill"
+                          (keydown.enter)="verifyPaybillPayment()"
+                      />
+                  <button
+                      mat-raised-button
+                      color="primary"
+                      class="w-full mt-2 mb-2 pay-now-button"
+                      (click)="verifyPaybillPayment()"
+                      [disabled]="isVerifyingPaybill"
+                  >
+                      <mat-spinner *ngIf="isVerifyingPaybill" diameter="24"></mat-spinner>
+                      <span *ngIf="!isVerifyingPaybill">Verify Payment</span>
+                  </button>
+              </form>
+
+
+
+              <!-- STK option -->
+              <div *ngIf="paymentForm.get('mpesaSubMethod')?.value === 'stk'">
+                  <label class="block text-base font-medium text-gray-700 mb-2">M-Pesa Number *</label>
+                  <input
+                      [class]="'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ' +
+           ((shipmentForm.get('mpesaNumber')?.invalid && shipmentForm.get('mpesaNumber')?.touched) || !shipmentForm.get('mpesaNumber')?.value ?
+           'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-pantone-teal') +
+           (shipmentForm.get('mpesaNumber')?.value ? ' font-bold' : '')"
+                      formControlName="mpesaNumber"
+                      placeholder="Enter M-Pesa number"
+                      maxlength="10"
+                      (input)="onMpesaNumberInput($event)"
+                  />
+                  <button
+                      mat-raised-button
+                      color="primary"
+                      class="w-full mt-2 mb-2 pay-now-button"
+                      [disabled]="isProcessPayment"
+                      (click)="initiatePayment()"
+                  >
+                      <mat-spinner *ngIf="isProcessPayment" diameter="24" class="mr-2"></mat-spinner>
+                      {{ isProcessPayment ? 'Processing...' : 'Make Payment' }}
+                  </button>
+              </div>
+             </div>
+
+              <!-- Submit / Payment buttons -->
+
+
+
+              <div *ngIf="toastMessage" class="animate-fade-in-out fixed bottom-5 right-5 z-50 rounded-lg bg-gray-800 px-5 py-3 text-white shadow-lg transition-opacity duration-300">{{ toastMessage }}</div>
+
         </div>
       </div>
     </div>
